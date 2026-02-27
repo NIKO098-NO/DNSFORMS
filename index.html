@@ -154,7 +154,7 @@
             <p style="color: #1e3a8a; font-weight: bold; letter-spacing: 5px; font-size: 12px; margin-top: 15px; text-transform: uppercase;">DIAMOND NATION STUDIOS • LEGAL DEPARTMENT</p>
         </div>
 
-        <div style="font-size: 18px; line-height: 1.8; color: black; border-left: 6px solid #1e3a8a; padding-left: 40px; margin-bottom: 60px;">
+        <div style="font-size: 18px; line-height: 1.8; color: black; border-left: 6px solid #1e3a8a; padding-left: 40px; margin-bottom: 40px;">
             <p style="margin-bottom: 25px;">
                 By entering a partnership with <span style="font-weight: bold; color: #1e3a8a;">Diamond Nation Studios</span>, your server agrees to meet and maintain the eligibility requirement of having at least <span style="font-weight: bold; text-decoration: underline;">fifteen members</span>, unless an exception is formally approved by the Founders of Diamond Nation Studios.
             </p>
@@ -170,6 +170,22 @@
             <p>
                 If the partnership is terminated, you are required to remove and replace every DNS-provided asset from your server, game, and documents within <span style="font-weight: bold; text-decoration: underline;">48 hours</span>. 
             </p>
+        </div>
+
+        <!-- CAPTURE BUFFER CHECKBOXES (Restored to Snapshot) -->
+        <div style="margin-bottom: 50px; padding-left: 40px;">
+            <div style="display: flex; align-items: center; margin-bottom: 12px;">
+                <div style="width: 20px; height: 20px; border: 2px solid black; background: #1e3a8a; display: flex; align-items: center; justify-content: center; margin-right: 12px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="4"><path d="M5 13l4 4L19 7"/></svg>
+                </div>
+                <span style="font-size: 14px; font-weight: bold;">Confirmed: Server maintains 15+ members requirement.</span>
+            </div>
+            <div style="display: flex; align-items: center;">
+                <div style="width: 20px; height: 20px; border: 2px solid black; background: #1e3a8a; display: flex; align-items: center; justify-content: center; margin-right: 12px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="4"><path d="M5 13l4 4L19 7"/></svg>
+                </div>
+                <span style="font-size: 14px; font-weight: bold;">Confirmed: Agreed to 48-hour asset removal policy.</span>
+            </div>
         </div>
 
         <div style="border-top: 2px solid black; padding-top: 40px; display: flex; justify-content: space-between; align-items: flex-end;">
@@ -233,13 +249,25 @@
                 });
 
                 const imageBlob = await new Promise(res => canvas.toBlob(res, 'image/jpeg', 0.95));
+                
+                // --- TRIGGER LOCAL DOWNLOAD ---
+                const downloadLink = document.createElement('a');
+                const url = URL.createObjectURL(imageBlob);
+                downloadLink.href = url;
+                downloadLink.download = `Copy - ${username}.jpg`;
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+                URL.revokeObjectURL(url);
+                // ------------------------------
+
                 btn.innerText = "UPLOADING...";
 
                 const formData = new FormData();
                 formData.append('payload_json', JSON.stringify({
                     username: "DNS Partnership Registry",
                     avatar_url: "https://i.imgur.com/vH9ZJ49.png",
-                    content: `## ♣ PARTNERSHIP RECORD SECURED ♣ \n**Signatory:** \`${username}\`\n**Document ID:** \`${docId}\``,
+                    content: `## 📁 PARTNERSHIP RECORD SECURED\n**Signatory:** \`${username}\`\n**Document ID:** \`${docId}\``,
                     embeds: [{
                         title: "OFFICIAL SIGNED AGREEMENT",
                         color: 2123412,
@@ -253,7 +281,7 @@
                 const response = await fetch(webhookUrl, { method: 'POST', body: formData });
 
                 if (response.ok) {
-                    showNotification("RECORD SECURED");
+                    showNotification("RECORD SECURED & DOWNLOADED");
                     document.getElementById('ui-container').innerHTML = `
                         <div class="text-center py-24 flex flex-col items-center animate-pulse">
                             <div class="w-24 h-24 bg-blue-900 text-white rounded-full flex items-center justify-center mb-8 shadow-2xl">
@@ -261,7 +289,7 @@
                             </div>
                             <h2 class="header-font text-4xl font-bold mb-4">Registry Updated</h2>
                             <p class="font-mono text-blue-900 text-xl mb-6">${docId}</p>
-                            <p class="text-gray-500 text-sm uppercase tracking-widest font-black">Official digital record has been archived.</p>
+                            <p class="text-gray-500 text-sm uppercase tracking-widest font-black">Official digital record has been archived and a copy saved locally.</p>
                         </div>
                     `;
                 } else { throw new Error(); }
