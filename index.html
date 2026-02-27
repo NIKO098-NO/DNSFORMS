@@ -6,88 +6,82 @@
     <title>Diamond Nation Studios | Partnership Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,700;1,700&family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Playfair+Display:wght@700&family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+          theme: {
+            extend: {
+              fontFamily: { sans: ['Inter', 'sans-serif'] }
+            }
+          }
+        }
+    </script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
-            min-height: 100vh;
+            background: #f3f4f6;
             -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
         }
+        /* The Actual UI (Interactive) */
         .paper {
             background: #ffffff;
             position: relative;
-            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+        /* The Capturable Layer (Hidden from user, optimized for high-fidelity rendering) */
+        #capture-buffer {
+            position: absolute;
+            top: -9999px;
+            left: -9999px;
+            width: 850px; 
+            background: white;
+            color: black;
+            padding: 80px;
         }
         .watermark {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%) rotate(-45deg);
-            font-size: 15rem;
+            font-size: 12rem;
             font-weight: 900;
-            color: rgba(30, 58, 138, 0.03);
+            color: rgba(0, 0, 0, 0.02); 
             pointer-events: none;
             z-index: 0;
+            white-space: nowrap;
         }
-        .document-text {
-            line-height: 1.8;
-            color: #000000;
-            z-index: 10;
-            position: relative;
-        }
-        .header-font {
-            font-family: 'Playfair Display', serif;
-        }
-        .signature-font {
-            font-family: 'Dancing Script', cursive;
-        }
+        .header-font { font-family: 'Playfair Display', serif; }
+        .signature-font { font-family: 'Dancing Script', cursive; }
         .checkbox-custom:checked + label .box {
             background-color: #1e3a8a;
             border-color: #1e3a8a;
         }
-        .fade-in {
-            animation: fadeIn 0.8s ease-out;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        /* Targets the capture specifically to prevent any blur */
-        .snapshot-mode {
-            background: #ffffff !important;
-            color: #000000 !important;
-            width: 1000px !important;
-            padding: 80px !important;
-        }
     </style>
 </head>
 <body class="py-12 px-4 flex items-center justify-center">
-    <div id="document-capture" class="max-w-4xl w-full paper p-8 md:p-20 shadow-2xl rounded-lg border-t-[12px] border-blue-900 fade-in">
-        <div class="watermark" id="watermark-el">DNS</div>
+
+    <!-- VISUAL INTERFACE -->
+    <div id="ui-container" class="max-w-4xl w-full paper p-8 md:p-20 rounded-lg border-t-[12px] border-blue-900 transition-opacity duration-500">
+        <div class="watermark">DNS</div>
         
-        <!-- Document ID Header -->
         <div class="flex justify-between items-start mb-8 text-[10px] font-mono text-gray-500 uppercase tracking-widest">
-            <div id="doc-id-display">ID: GENERATING...</div>
+            <div id="display-id">ID: GENERATING...</div>
             <div>STATUS: OFFICIAL ORIGINAL RECORD</div>
         </div>
 
-        <!-- Logo/Header Area -->
         <div class="flex flex-col items-center mb-12">
-            <div class="w-20 h-20 bg-blue-900 rounded-full flex items-center justify-center mb-6 shadow-lg">
+            <div class="w-20 h-20 bg-blue-900 rounded-full flex items-center justify-center mb-6">
                 <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
                 </svg>
             </div>
-            <h1 class="header-font text-4xl md:text-5xl text-black text-center font-bold">Partnership Agreement</h1>
+            <h1 class="header-font text-4xl md:text-5xl text-black font-bold text-center">Partnership Agreement</h1>
             <p class="text-blue-800 font-bold tracking-[0.3em] uppercase text-xs mt-4">Diamond Nation Studios • Legal Department</p>
         </div>
 
-        <!-- Document Content -->
-        <div class="document-text space-y-8 text-lg mb-16 border-l-4 border-blue-900 pl-6 md:pl-10">
+        <div class="space-y-8 text-lg mb-16 border-l-4 border-blue-900 pl-6 text-gray-900 leading-relaxed">
             <p>
-                By entering a partnership with <span class="font-bold text-blue-900">Diamond Nation Studios</span>, your server agrees to meet and maintain the eligibility requirement of having at least <span class="font-bold underline decoration-blue-500 decoration-2">fifteen members</span>, unless an exception is formally approved by the Founders of Diamond Nation Studios.
+                By entering a partnership with <span class="font-bold text-blue-900">Diamond Nation Studios</span>, your server agrees to meet and maintain the eligibility requirement of having at least <span class="font-bold underline">fifteen members</span>, unless an exception is formally approved by the Founders of Diamond Nation Studios.
             </p>
             <p>
                 Upon acceptance, you are required to fully comply with all branding standards set by DNS, which includes the mandatory use of all provided logos, decals, and promotional materials exactly as delivered, without alteration or redistribution of any kind. 
@@ -103,154 +97,177 @@
             </p>
         </div>
 
-        <!-- Interactive Confirmations -->
-        <div id="check-container" class="space-y-4 mb-12">
+        <div class="space-y-4 mb-12">
             <div class="flex items-start">
                 <input type="checkbox" id="check1" class="hidden checkbox-custom" required>
                 <label for="check1" class="flex items-start cursor-pointer group">
-                    <div class="box w-6 h-6 border-2 border-black rounded mr-3 mt-1 flex-shrink-0 transition-all flex items-center justify-center bg-white">
+                    <div class="box w-6 h-6 border-2 border-black rounded mr-3 mt-1 flex-shrink-0 flex items-center justify-center bg-white">
                         <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7"></path></svg>
                     </div>
-                    <span class="text-sm text-black group-hover:text-blue-900 transition-colors font-bold">I confirm my server maintains at least 15 active members or has a formal exception.</span>
+                    <span class="text-sm font-bold">I confirm my server maintains at least 15 active members or has a formal exception.</span>
                 </label>
             </div>
             <div class="flex items-start">
                 <input type="checkbox" id="check2" class="hidden checkbox-custom" required>
                 <label for="check2" class="flex items-start cursor-pointer group">
-                    <div class="box w-6 h-6 border-2 border-black rounded mr-3 mt-1 flex-shrink-0 transition-all flex items-center justify-center bg-white">
+                    <div class="box w-6 h-6 border-2 border-black rounded mr-3 mt-1 flex-shrink-0 flex items-center justify-center bg-white">
                         <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7"></path></svg>
                     </div>
-                    <span class="text-sm text-black group-hover:text-blue-900 transition-colors font-bold">I agree to the 48-hour asset removal policy upon termination of this partnership.</span>
+                    <span class="text-sm font-bold">I agree to the 48-hour asset removal policy upon termination of this partnership.</span>
                 </label>
             </div>
         </div>
 
-        <!-- Signature Section -->
         <form id="signatureForm" class="bg-gray-100 p-8 rounded-xl border-2 border-gray-300">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
                 <div class="relative">
-                    <label class="block text-[10px] font-bold text-blue-900 uppercase tracking-[0.2em] mb-4">Official Signature</label>
-                    <input 
-                        type="text" 
-                        id="discordUsername" 
-                        required
-                        placeholder="Type Discord Username..."
-                        class="signature-font w-full bg-transparent border-b-2 border-black focus:border-blue-900 outline-none pb-2 text-4xl text-black transition-all placeholder:text-gray-400"
-                    >
-                    <p class="text-[10px] text-gray-500 mt-2 uppercase tracking-tighter font-bold">Verified Digital Signature of Representative</p>
+                    <label class="block text-[10px] font-bold text-blue-900 uppercase tracking-widest mb-4">Official Signature</label>
+                    <input type="text" id="discordUsername" required placeholder="Type Discord Username..." class="signature-font w-full bg-transparent border-b-2 border-black focus:border-blue-900 outline-none pb-2 text-4xl text-black placeholder:text-gray-400">
                 </div>
-
                 <div class="flex flex-col justify-end items-end">
-                    <p id="currentDate" class="text-black font-black mb-4 font-mono text-sm uppercase tracking-tighter"></p>
-                    <button 
-                        type="submit" 
-                        id="submitBtn"
-                        class="w-full bg-blue-900 hover:bg-black text-white font-bold py-4 px-12 rounded-lg transition-all shadow-xl hover:-translate-y-1 active:scale-95 disabled:opacity-50"
-                    >
-                        EXECUTE & ARCHIVE
-                    </button>
+                    <p id="currentDate" class="text-black font-bold mb-4 font-mono text-sm"></p>
+                    <button type="submit" id="submitBtn" disabled class="w-full bg-blue-900 hover:bg-black text-white font-bold py-4 px-12 rounded-lg transition-all shadow-xl disabled:opacity-50">SYNCING ASSETS...</button>
                 </div>
             </div>
         </form>
 
-        <footer class="mt-16 pt-8 border-t-2 border-black flex flex-col md:flex-row justify-between items-center text-[10px] text-black uppercase tracking-widest font-black">
+        <footer class="mt-16 pt-8 border-t-2 border-black flex justify-between items-center text-[10px] text-black uppercase font-black">
             <span>&copy; <span id="year"></span> Diamond Nation Studios</span>
-            <span class="mt-4 md:mt-0 font-mono" id="footer-doc-id">DOC-ID: ...</span>
+            <span class="font-mono" id="footer-id">DOC-ID: ...</span>
         </footer>
     </div>
 
-    <!-- Notification -->
+    <!-- HIDDEN CAPTURE BUFFER (Identical Content to Visual Interface) -->
+    <div id="capture-buffer" style="font-family: 'Inter', sans-serif;">
+        <div class="watermark" style="color: rgba(0,0,0,0.03); font-size: 15rem;">DNS</div>
+        
+        <div style="display: flex; justify-content: space-between; font-family: monospace; font-size: 10px; color: #666; margin-bottom: 50px; text-transform: uppercase; letter-spacing: 2px;">
+            <div id="buffer-id">ID: ...</div>
+            <div>STATUS: OFFICIAL ORIGINAL RECORD</div>
+        </div>
+
+        <div style="text-align: center; margin-bottom: 60px; display: flex; flex-direction: column; align-items: center;">
+            <div style="width: 80px; height: 80px; background: #1e3a8a; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 24px;">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+            </div>
+            <h1 class="header-font" style="font-size: 48px; color: black; margin: 0; font-weight: bold;">Partnership Agreement</h1>
+            <p style="color: #1e3a8a; font-weight: bold; letter-spacing: 5px; font-size: 12px; margin-top: 15px; text-transform: uppercase;">DIAMOND NATION STUDIOS • LEGAL DEPARTMENT</p>
+        </div>
+
+        <div style="font-size: 18px; line-height: 1.8; color: black; border-left: 6px solid #1e3a8a; padding-left: 40px; margin-bottom: 60px;">
+            <p style="margin-bottom: 25px;">
+                By entering a partnership with <span style="font-weight: bold; color: #1e3a8a;">Diamond Nation Studios</span>, your server agrees to meet and maintain the eligibility requirement of having at least <span style="font-weight: bold; text-decoration: underline;">fifteen members</span>, unless an exception is formally approved by the Founders of Diamond Nation Studios.
+            </p>
+            <p style="margin-bottom: 25px;">
+                Upon acceptance, you are required to fully comply with all branding standards set by DNS, which includes the mandatory use of all provided logos, decals, and promotional materials exactly as delivered, without alteration or redistribution of any kind. 
+            </p>
+            <p style="margin-bottom: 25px;">
+                Additionally, your server must establish a role titled <span style="font-weight: bold; color: #1e3a8a;">"Diamond Nation"</span>, designated as the highest administrative role in your server, equipped with full administrative permissions to ensure proper oversight and coordination with DNS leadership. 
+            </p>
+            <p style="margin-bottom: 25px;">
+                All logos, decals, and branding assets remain the exclusive property of Diamond Nation Studios. Misuse of assets, failure to uphold branding requirements, or refusal to maintain proper administrative structure may result in <span style="font-weight: bold; color: #b91c1c; text-transform: uppercase; text-decoration: underline;">immediate removal</span> from the program.
+            </p>
+            <p>
+                If the partnership is terminated, you are required to remove and replace every DNS-provided asset from your server, game, and documents within <span style="font-weight: bold; text-decoration: underline;">48 hours</span>. 
+            </p>
+        </div>
+
+        <div style="border-top: 2px solid black; padding-top: 40px; display: flex; justify-content: space-between; align-items: flex-end;">
+            <div>
+                <label style="font-size: 10px; font-weight: bold; color: #1e3a8a; display: block; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 2px;">Official Signature</label>
+                <div id="buffer-signature" class="signature-font" style="font-size: 56px; border-bottom: 2px solid black; padding-bottom: 5px; min-width: 350px; color: black; line-height: 1;"></div>
+            </div>
+            <div style="text-align: right;">
+                <p id="buffer-date" style="font-family: monospace; font-weight: bold; font-size: 14px; margin: 0; color: black;"></p>
+                <p style="font-size: 10px; color: #666; margin: 0; margin-top: 8px; text-transform: uppercase; letter-spacing: 1px;">DIGITALLY SECURED & ARCHIVED</p>
+            </div>
+        </div>
+    </div>
+
     <div id="notification" class="fixed top-8 right-8 px-8 py-4 rounded-lg shadow-2xl text-white font-bold transform transition-all translate-x-[150%] z-50"></div>
 
     <script>
-        const documentId = "DNS-" + Math.random().toString(36).substr(2, 4).toUpperCase() + "-" + Math.random().toString(36).substr(2, 4).toUpperCase() + "-" + Math.random().toString(36).substr(2, 4).toUpperCase();
-        
-        document.getElementById('doc-id-display').innerText = "ID: " + documentId;
-        document.getElementById('footer-doc-id').innerText = "DOC-ID: " + documentId;
-
-        const now = new Date();
-        document.getElementById('currentDate').innerText = now.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-        document.getElementById('year').innerText = now.getFullYear();
-
+        const docId = "DNS-" + Array.from({length: 3}, () => Math.random().toString(36).substr(2, 4).toUpperCase()).join("-");
         const webhookUrl = "https://discord.com/api/webhooks/1476955076202463282/5LShV9nF7d9C2ivqkt_gFqtxv31A03OmTCkEEtBLANaK3CVXZPiW9gnc4SnHVjYUj0g8";
         
-        function showNotification(message, isError = false) {
+        document.getElementById('display-id').innerText = "ID: " + docId;
+        document.getElementById('footer-id').innerText = "DOC-ID: " + docId;
+        document.getElementById('buffer-id').innerText = "ID: " + docId;
+
+        const dateStr = new Date().toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        document.getElementById('currentDate').innerText = dateStr;
+        document.getElementById('buffer-date').innerText = dateStr.toUpperCase();
+        document.getElementById('year').innerText = new Date().getFullYear();
+
+        window.addEventListener('load', () => {
+            document.fonts.ready.then(() => {
+                const btn = document.getElementById('submitBtn');
+                btn.disabled = false; btn.innerText = "EXECUTE & ARCHIVE";
+            });
+        });
+
+        function showNotification(msg, err = false) {
             const n = document.getElementById('notification');
-            n.innerText = message;
-            n.className = `fixed top-8 right-8 px-8 py-4 rounded-lg shadow-2xl text-white font-bold transform transition-all z-50 ${isError ? 'bg-red-600' : 'bg-blue-900'}`;
+            n.innerText = msg;
+            n.className = `fixed top-8 right-8 px-8 py-4 rounded-lg shadow-2xl text-white font-bold transform transition-all z-50 ${err ? 'bg-red-600' : 'bg-blue-900'}`;
             n.style.transform = "translateX(0)";
             setTimeout(() => { n.style.transform = "translateX(150%)"; }, 4000);
         }
 
         document.getElementById('signatureForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
             const username = document.getElementById('discordUsername').value;
             const btn = document.getElementById('submitBtn');
-            const docElement = document.getElementById('document-capture');
+            const buffer = document.getElementById('capture-buffer');
             
-            btn.disabled = true;
-            btn.innerText = "CAPTURING SOLID ARCHIVE...";
+            btn.disabled = true; btn.innerText = "CAPTURING ARCHIVE...";
+            document.getElementById('buffer-signature').innerText = username;
 
             try {
-                // FIXED CAPTURE LOGIC: Scale set to 4 for HD, background forced to #FFFFFF for NO transparency
-                const canvas = await html2canvas(docElement, {
-                    scale: 4, 
+                const canvas = await html2canvas(buffer, {
+                    scale: 2,
+                    backgroundColor: "#ffffff",
                     useCORS: true,
-                    backgroundColor: "#ffffff", // FORCES SOLID WHITE BACKGROUND
                     logging: false,
-                    onclone: (clonedDoc) => {
-                        const el = clonedDoc.getElementById('document-capture');
-                        // Ensure the capture version is solid and opaque
-                        el.style.backgroundColor = "#ffffff";
-                        el.style.boxShadow = "none";
-                    }
+                    allowTaint: false
                 });
 
-                const imageBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png', 1.0));
-
+                const imageBlob = await new Promise(res => canvas.toBlob(res, 'image/jpeg', 0.95));
                 btn.innerText = "UPLOADING...";
 
-                const embedData = {
+                const formData = new FormData();
+                formData.append('payload_json', JSON.stringify({
                     username: "DNS Partnership Registry",
-                    avatar_url: "https://i.imgur.com/vH9ZJ49.png", 
-                    content: `## 📁 NEW PARTNERSHIP ARCHIVED\n**Signatory:** ${username}\n**ID:** \`${documentId}\``,
+                    avatar_url: "https://i.imgur.com/vH9ZJ49.png",
+                    content: `## 📁 PARTNERSHIP RECORD SECURED\n**Signatory:** \`${username}\`\n**Document ID:** \`${docId}\``,
                     embeds: [{
                         title: "OFFICIAL SIGNED AGREEMENT",
-                        color: 0, 
-                        image: { url: "attachment://signature.png" },
-                        footer: { text: `Verification ID: ${documentId} | DNS Legal Systems` },
+                        color: 2123412,
+                        image: { url: "attachment://signature.jpg" },
+                        footer: { text: `Verification ID: ${docId}` },
                         timestamp: new Date().toISOString()
                     }]
-                };
+                }));
+                formData.append('file', imageBlob, 'signature.jpg');
 
-                const formData = new FormData();
-                formData.append('payload_json', JSON.stringify(embedData));
-                formData.append('file', imageBlob, 'signature.png');
-
-                const response = await fetch(webhookUrl, {
-                    method: 'POST',
-                    body: formData
-                });
+                const response = await fetch(webhookUrl, { method: 'POST', body: formData });
 
                 if (response.ok) {
-                    showNotification("SOLID RECORD ARCHIVED");
-                    document.querySelector('body').innerHTML = `
-                        <div class="text-center py-20 flex flex-col items-center fade-in bg-white min-h-screen justify-center px-4">
+                    showNotification("RECORD SECURED");
+                    document.getElementById('ui-container').innerHTML = `
+                        <div class="text-center py-24 flex flex-col items-center animate-pulse">
                             <div class="w-24 h-24 bg-blue-900 text-white rounded-full flex items-center justify-center mb-8 shadow-2xl">
                                 <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                             </div>
-                            <h2 class="header-font text-4xl text-black mb-4 text-center font-bold">Record Secured</h2>
-                            <p class="text-gray-700 max-w-md mx-auto mb-8 text-center font-mono text-sm">Official Document ID:<br><span class="text-blue-900 font-bold text-xl">${documentId}</span></p>
-                            <p class="text-gray-500 text-sm mb-8 text-center">A high-contrast, non-transparent snapshot has been saved.</p>
+                            <h2 class="header-font text-4xl font-bold mb-4">Registry Updated</h2>
+                            <p class="font-mono text-blue-900 text-xl mb-6">${docId}</p>
+                            <p class="text-gray-500 text-sm uppercase tracking-widest font-black">Official digital record has been archived.</p>
                         </div>
                     `;
                 } else { throw new Error(); }
             } catch (err) {
-                console.error(err);
-                showNotification("ARCHIVE ERROR", true);
-                btn.disabled = false;
-                btn.innerText = "EXECUTE & ARCHIVE";
+                showNotification("ARCHIVE FAILED", true);
+                btn.disabled = false; btn.innerText = "RETRY ARCHIVE";
             }
         });
     </script>
