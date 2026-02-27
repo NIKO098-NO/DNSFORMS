@@ -54,6 +54,13 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        /* Targets the capture specifically to prevent any blur */
+        .snapshot-mode {
+            background: #ffffff !important;
+            color: #000000 !important;
+            width: 1000px !important;
+            padding: 80px !important;
+        }
     </style>
 </head>
 <body class="py-12 px-4 flex items-center justify-center">
@@ -183,40 +190,23 @@
             const docElement = document.getElementById('document-capture');
             
             btn.disabled = true;
-            btn.innerText = "CAPTURING 4K ARCHIVE...";
+            btn.innerText = "CAPTURING SOLID ARCHIVE...";
 
             try {
-                // THE 4K FIX: High scale (5) for ultra resolution + Solid Background to prevent transparency
+                // FIXED CAPTURE LOGIC: Scale set to 4 for HD, background forced to #FFFFFF for NO transparency
                 const canvas = await html2canvas(docElement, {
-                    scale: 5, 
+                    scale: 4, 
                     useCORS: true,
-                    allowTaint: false,
-                    backgroundColor: "#ffffff", // FORCES SOLID OPAQUE BACKGROUND
+                    backgroundColor: "#ffffff", // FORCES SOLID WHITE BACKGROUND
                     logging: false,
                     onclone: (clonedDoc) => {
                         const el = clonedDoc.getElementById('document-capture');
-                        const wm = clonedDoc.getElementById('watermark-el');
-                        
-                        // SNAPSHOT CLARITY: Hide the faint watermark in the snapshot only to keep text perfectly readable
-                        if (wm) wm.style.display = 'none'; 
-                        
-                        // SNAPSHOT CLARITY: Force absolute contrast and layout dimensions
-                        el.style.color = "#000000";
+                        // Ensure the capture version is solid and opaque
                         el.style.backgroundColor = "#ffffff";
-                        el.style.width = "1000px";
-                        el.style.padding = "80px";
                         el.style.boxShadow = "none";
-                        
-                        // Ensure all elements are 100% opaque in capture
-                        const all = el.querySelectorAll('*');
-                        all.forEach(t => {
-                            t.style.opacity = "1";
-                            t.style.textShadow = "none";
-                        });
                     }
                 });
 
-                // Export as high-quality PNG
                 const imageBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png', 1.0));
 
                 btn.innerText = "UPLOADING...";
@@ -224,9 +214,9 @@
                 const embedData = {
                     username: "DNS Partnership Registry",
                     avatar_url: "https://i.imgur.com/vH9ZJ49.png", 
-                    content: `## 📁 NEW 4K PARTNERSHIP ARCHIVED\n**Signatory:** ${username}\n**ID:** \`${documentId}\``,
+                    content: `## 📁 NEW PARTNERSHIP ARCHIVED\n**Signatory:** ${username}\n**ID:** \`${documentId}\``,
                     embeds: [{
-                        title: "OFFICIAL SIGNED AGREEMENT (4K)",
+                        title: "OFFICIAL SIGNED AGREEMENT",
                         color: 0, 
                         image: { url: "attachment://signature.png" },
                         footer: { text: `Verification ID: ${documentId} | DNS Legal Systems` },
@@ -244,7 +234,7 @@
                 });
 
                 if (response.ok) {
-                    showNotification("4K RECORD ARCHIVED");
+                    showNotification("SOLID RECORD ARCHIVED");
                     document.querySelector('body').innerHTML = `
                         <div class="text-center py-20 flex flex-col items-center fade-in bg-white min-h-screen justify-center px-4">
                             <div class="w-24 h-24 bg-blue-900 text-white rounded-full flex items-center justify-center mb-8 shadow-2xl">
@@ -252,7 +242,7 @@
                             </div>
                             <h2 class="header-font text-4xl text-black mb-4 text-center font-bold">Record Secured</h2>
                             <p class="text-gray-700 max-w-md mx-auto mb-8 text-center font-mono text-sm">Official Document ID:<br><span class="text-blue-900 font-bold text-xl">${documentId}</span></p>
-                            <p class="text-gray-500 text-sm mb-8 text-center">A high-definition, solid 4K snapshot has been archived.</p>
+                            <p class="text-gray-500 text-sm mb-8 text-center">A high-contrast, non-transparent snapshot has been saved.</p>
                         </div>
                     `;
                 } else { throw new Error(); }
