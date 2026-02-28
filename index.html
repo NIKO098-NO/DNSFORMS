@@ -22,13 +22,11 @@
             background: #f3f4f6;
             -webkit-font-smoothing: antialiased;
         }
-        /* The Actual UI (Interactive) */
         .paper {
             background: #ffffff;
             position: relative;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
         }
-        /* The Capturable Layer (Hidden from user, optimized for high-fidelity rendering) */
         #capture-buffer {
             position: absolute;
             top: -9999px;
@@ -52,9 +50,45 @@
         }
         .header-font { font-family: 'Playfair Display', serif; }
         .signature-font { font-family: 'Dancing Script', cursive; }
+        
         .checkbox-custom:checked + label .box {
             background-color: #1e3a8a;
             border-color: #1e3a8a;
+        }
+        .checkbox-custom:not(:checked) + label .box {
+            border-color: #000;
+        }
+
+        /* LIVE UI LINE */
+        .sig-container {
+            border-bottom: 2px solid #000;
+            display: flex;
+            align-items: flex-end;
+            height: 60px;
+            width: 100%;
+            position: relative;
+        }
+        
+        #discordUsername {
+            margin-bottom: -10px;
+            line-height: 1;
+            padding: 0;
+            background: transparent;
+            border: none;
+            font-size: 2.25rem;
+        }
+
+        /* SNAPSHOT BUFFER - ALIGNMENT FIX */
+        #buffer-signature {
+            line-height: 0.8;
+            display: inline-block;
+            font-size: 84px;
+            transform: translateY(-8px); /* Moves it slightly up from the baseline */
+        }
+
+        #downloadModal {
+            backdrop-filter: blur(8px);
+            background: rgba(0,0,0,0.6);
         }
     </style>
 </head>
@@ -70,7 +104,7 @@
         </div>
 
         <div class="flex flex-col items-center mb-12">
-            <div class="w-20 h-20 bg-blue-900 rounded-full flex items-center justify-center mb-6">
+            <div class="w-20 h-20 bg-blue-900 rounded-full flex items-center justify-center mb-6 shadow-lg">
                 <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
                 </svg>
@@ -79,7 +113,7 @@
             <p class="text-blue-800 font-bold tracking-[0.3em] uppercase text-xs mt-4">Diamond Nation Studios • Legal Department</p>
         </div>
 
-        <div class="space-y-8 text-lg mb-16 border-l-4 border-blue-900 pl-6 text-gray-900 leading-relaxed">
+        <div class="space-y-8 text-lg mb-16 border-l-4 border-blue-900 pl-6 text-gray-900 leading-relaxed text-justify">
             <p>
                 By entering a partnership with <span class="font-bold text-blue-900">Diamond Nation Studios</span>, your server agrees to meet and maintain the eligibility requirement of having at least <span class="font-bold underline">fifteen members</span>, unless an exception is formally approved by the Founders of Diamond Nation Studios.
             </p>
@@ -97,36 +131,40 @@
             </p>
         </div>
 
-        <div class="space-y-4 mb-12">
+        <div class="space-y-4 mb-12" id="requirements-section">
             <div class="flex items-start">
-                <input type="checkbox" id="check1" class="hidden checkbox-custom" required>
+                <input type="checkbox" id="check1" class="hidden checkbox-custom">
                 <label for="check1" class="flex items-start cursor-pointer group">
-                    <div class="box w-6 h-6 border-2 border-black rounded mr-3 mt-1 flex-shrink-0 flex items-center justify-center bg-white">
+                    <div class="box w-6 h-6 border-2 rounded mr-3 mt-1 flex-shrink-0 flex items-center justify-center bg-white transition-colors">
                         <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7"></path></svg>
                     </div>
-                    <span class="text-sm font-bold">I confirm my server maintains at least 15 active members or has a formal exception.</span>
+                    <span class="text-sm font-bold group-hover:text-blue-900 transition-colors">I confirm my server maintains at least 15 active members or has a formal exception. <span class="text-red-500">*</span></span>
                 </label>
             </div>
             <div class="flex items-start">
-                <input type="checkbox" id="check2" class="hidden checkbox-custom" required>
+                <input type="checkbox" id="check2" class="hidden checkbox-custom">
                 <label for="check2" class="flex items-start cursor-pointer group">
-                    <div class="box w-6 h-6 border-2 border-black rounded mr-3 mt-1 flex-shrink-0 flex items-center justify-center bg-white">
+                    <div class="box w-6 h-6 border-2 rounded mr-3 mt-1 flex-shrink-0 flex items-center justify-center bg-white transition-colors">
                         <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7"></path></svg>
                     </div>
-                    <span class="text-sm font-bold">I agree to the 48-hour asset removal policy upon termination of this partnership.</span>
+                    <span class="text-sm font-bold group-hover:text-blue-900 transition-colors">I agree to the 48-hour asset removal policy upon termination of this partnership. <span class="text-red-500">*</span></span>
                 </label>
             </div>
         </div>
 
-        <form id="signatureForm" class="bg-gray-100 p-8 rounded-xl border-2 border-gray-300">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
-                <div class="relative">
-                    <label class="block text-[10px] font-bold text-blue-900 uppercase tracking-widest mb-4">Official Signature</label>
-                    <input type="text" id="discordUsername" required placeholder="Type Discord Username..." class="signature-font w-full bg-transparent border-b-2 border-black focus:border-blue-900 outline-none pb-2 text-4xl text-black placeholder:text-gray-400">
-                </div>
-                <div class="flex flex-col justify-end items-end">
-                    <p id="currentDate" class="text-black font-bold mb-4 font-mono text-sm"></p>
-                    <button type="submit" id="submitBtn" disabled class="w-full bg-blue-900 hover:bg-black text-white font-bold py-4 px-12 rounded-lg transition-all shadow-xl disabled:opacity-50">SYNCING ASSETS...</button>
+        <form id="signatureForm">
+            <div class="bg-gray-100 p-8 rounded-xl border-2 border-gray-300">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                    <div class="relative pt-6">
+                        <label class="absolute top-0 left-0 text-[10px] font-bold text-blue-900 uppercase tracking-widest">Official Signature</label>
+                        <div class="sig-container">
+                            <input type="text" id="discordUsername" required placeholder="Type Discord Username..." class="signature-font w-full text-black placeholder:text-gray-400 outline-none">
+                        </div>
+                    </div>
+                    <div class="flex flex-col justify-end items-end">
+                        <p id="currentDate" class="text-black font-bold mb-4 font-mono text-sm"></p>
+                        <button type="submit" id="submitBtn" disabled class="w-full bg-blue-900 hover:bg-black text-white font-bold py-4 px-12 rounded-lg transition-all shadow-xl disabled:opacity-30 disabled:cursor-not-allowed">EXECUTE & ARCHIVE</button>
+                    </div>
                 </div>
             </div>
         </form>
@@ -137,8 +175,20 @@
         </footer>
     </div>
 
-    <!-- HIDDEN CAPTURE BUFFER (Identical Content to Visual Interface) -->
-    <div id="capture-buffer" style="font-family: 'Inter', sans-serif;">
+    <!-- CHOICE MODAL -->
+    <div id="downloadModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
+        <div class="bg-white max-w-md w-full rounded-2xl p-8 shadow-2xl border-4 border-blue-900 transform scale-100 transition-transform">
+            <h3 class="header-font text-2xl font-bold mb-4 text-black text-center">Agreement Secured</h3>
+            <p class="text-gray-600 mb-8 text-center text-lg">Would you like a local copy of this document for your personal records?</p>
+            <div class="grid grid-cols-2 gap-4">
+                <button id="noDownload" class="py-3 px-6 rounded-lg font-black text-gray-500 hover:bg-gray-100 transition-colors border-2 border-gray-200 uppercase text-xs tracking-widest">No, Skip</button>
+                <button id="yesDownload" class="py-3 px-6 rounded-lg font-black bg-blue-900 text-white hover:bg-black transition-colors shadow-lg uppercase text-xs tracking-widest">Yes, Download</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- HIDDEN CAPTURE BUFFER -->
+    <div id="capture-buffer">
         <div class="watermark" style="color: rgba(0,0,0,0.03); font-size: 15rem;">DNS</div>
         
         <div style="display: flex; justify-content: space-between; font-family: monospace; font-size: 10px; color: #666; margin-bottom: 50px; text-transform: uppercase; letter-spacing: 2px;">
@@ -172,7 +222,6 @@
             </p>
         </div>
 
-        <!-- CAPTURE BUFFER CHECKBOXES (Restored to Snapshot) -->
         <div style="margin-bottom: 50px; padding-left: 40px;">
             <div style="display: flex; align-items: center; margin-bottom: 12px;">
                 <div style="width: 20px; height: 20px; border: 2px solid black; background: #1e3a8a; display: flex; align-items: center; justify-content: center; margin-right: 12px;">
@@ -188,14 +237,25 @@
             </div>
         </div>
 
-        <div style="border-top: 2px solid black; padding-top: 40px; display: flex; justify-content: space-between; align-items: flex-end;">
-            <div>
-                <label style="font-size: 10px; font-weight: bold; color: #1e3a8a; display: block; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 2px;">Official Signature</label>
-                <div id="buffer-signature" class="signature-font" style="font-size: 56px; border-bottom: 2px solid black; padding-bottom: 5px; min-width: 350px; color: black; line-height: 1;"></div>
+        <!-- CAPTURE SIGNATURE SECTION: FIXED POSITIONAL LOGIC -->
+        <div style="border-top: 2px solid black; margin-top: 40px; padding-top: 15px; position: relative; height: 160px;">
+            <!-- Official Signature Label -->
+            <label style="font-size: 10px; font-weight: bold; color: #1e3a8a; text-transform: uppercase; letter-spacing: 2px; position: absolute; top: 15px; left: 0;">Official Signature</label>
+            
+            <!-- Signature Placement: Flex-end ensures it sits ON the line -->
+            <div style="position: absolute; bottom: 65px; left: 0; min-width: 450px; display: flex; align-items: flex-end; height: 100px;">
+                <span id="buffer-signature" class="signature-font" style="color: black; white-space: nowrap;"></span>
             </div>
-            <div style="text-align: right;">
-                <p id="buffer-date" style="font-family: monospace; font-weight: bold; font-size: 14px; margin: 0; color: black;"></p>
-                <p style="font-size: 10px; color: #666; margin: 0; margin-top: 8px; text-transform: uppercase; letter-spacing: 1px;">DIGITALLY SECURED & ARCHIVED</p>
+
+            <!-- Footer Text below the signature line -->
+            <div style="position: absolute; bottom: 0; width: 100%; display: flex; justify-content: space-between; align-items: flex-end;">
+                <div>
+                    <p style="font-size: 8px; color: #999; text-transform: uppercase; margin: 0;">Verified digital signature of representative</p>
+                </div>
+                <div style="text-align: right;">
+                    <p id="buffer-date" style="font-family: monospace; font-weight: bold; font-size: 14px; margin: 0; color: black;"></p>
+                    <p style="font-size: 10px; color: #666; margin: 0; margin-top: 4px; text-transform: uppercase; letter-spacing: 1px;">DIGITALLY SECURED & ARCHIVED</p>
+                </div>
             </div>
         </div>
     </div>
@@ -215,11 +275,22 @@
         document.getElementById('buffer-date').innerText = dateStr.toUpperCase();
         document.getElementById('year').innerText = new Date().getFullYear();
 
-        window.addEventListener('load', () => {
-            document.fonts.ready.then(() => {
-                const btn = document.getElementById('submitBtn');
-                btn.disabled = false; btn.innerText = "EXECUTE & ARCHIVE";
-            });
+        const check1 = document.getElementById('check1');
+        const check2 = document.getElementById('check2');
+        const usernameInput = document.getElementById('discordUsername');
+        const submitBtn = document.getElementById('submitBtn');
+        const modal = document.getElementById('downloadModal');
+
+        let globalBlob = null;
+        let globalUsername = "";
+
+        function validateForm() {
+            submitBtn.disabled = !(check1.checked && check2.checked && usernameInput.value.trim().length > 0);
+        }
+
+        [check1, check2, usernameInput].forEach(el => {
+            el.addEventListener('input', validateForm);
+            el.addEventListener('change', validateForm);
         });
 
         function showNotification(msg, err = false) {
@@ -232,72 +303,86 @@
 
         document.getElementById('signatureForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const username = document.getElementById('discordUsername').value;
-            const btn = document.getElementById('submitBtn');
-            const buffer = document.getElementById('capture-buffer');
+            globalUsername = usernameInput.value;
             
-            btn.disabled = true; btn.innerText = "CAPTURING ARCHIVE...";
-            document.getElementById('buffer-signature').innerText = username;
+            submitBtn.disabled = true; 
+            submitBtn.innerText = "CAPTURING ARCHIVE...";
+            document.getElementById('buffer-signature').innerText = globalUsername;
 
             try {
-                const canvas = await html2canvas(buffer, {
-                    scale: 2,
+                await new Promise(r => setTimeout(r, 600)); 
+
+                const canvas = await html2canvas(document.getElementById('capture-buffer'), {
+                    scale: 3,
                     backgroundColor: "#ffffff",
                     useCORS: true,
-                    logging: false,
-                    allowTaint: false
+                    logging: false
                 });
 
-                const imageBlob = await new Promise(res => canvas.toBlob(res, 'image/jpeg', 0.95));
-                
-                // --- TRIGGER LOCAL DOWNLOAD ---
-                const downloadLink = document.createElement('a');
-                const url = URL.createObjectURL(imageBlob);
-                downloadLink.href = url;
-                downloadLink.download = `Copy - ${username}.jpg`;
-                document.body.appendChild(downloadLink);
-                downloadLink.click();
-                document.body.removeChild(downloadLink);
-                URL.revokeObjectURL(url);
-                // ------------------------------
+                globalBlob = await new Promise(res => canvas.toBlob(res, 'image/jpeg', 0.95));
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            } catch (err) {
+                showNotification("CAPTURE FAILED", true);
+                submitBtn.disabled = false;
+            }
+        });
 
-                btn.innerText = "UPLOADING...";
+        document.getElementById('yesDownload').addEventListener('click', () => {
+            const url = URL.createObjectURL(globalBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `DNS_Signed_Agreement_${globalUsername.replace(/\s+/g, '_')}.jpg`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            proceedToWebhook();
+        });
 
+        document.getElementById('noDownload').addEventListener('click', () => {
+            proceedToWebhook();
+        });
+
+        async function proceedToWebhook() {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            submitBtn.innerText = "UPLOADING TO REGISTRY...";
+
+            try {
                 const formData = new FormData();
                 formData.append('payload_json', JSON.stringify({
                     username: "DNS Partnership Registry",
-                    avatar_url: "https://i.imgur.com/vH9ZJ49.png",
-                    content: `## ♣ PARTNERSHIP RECORD SECURED ♣\n**Signatory:** \`${username}\`\n**Document ID:** \`${docId}\``,
+                    content: `## ♣ PARTNERSHIP RECORD ARCHIVED ♣\n**Representative:** \`${globalUsername}\`\n**ID:** \`${docId}\``,
                     embeds: [{
                         title: "OFFICIAL SIGNED AGREEMENT",
                         color: 2123412,
-                        image: { url: "attachment://signature.jpg" },
-                        footer: { text: `Verification ID: ${docId}` },
+                        image: { url: "attachment://signed.jpg" },
                         timestamp: new Date().toISOString()
                     }]
                 }));
-                formData.append('file', imageBlob, 'signature.jpg');
+                formData.append('file', globalBlob, 'signed.jpg');
 
-                const response = await fetch(webhookUrl, { method: 'POST', body: formData });
+                const res = await fetch(webhookUrl, { method: 'POST', body: formData });
 
-                if (response.ok) {
-                    showNotification("RECORD SECURED & DOWNLOADED");
+                if (res.ok) {
+                    showNotification("RECORD SECURED");
                     document.getElementById('ui-container').innerHTML = `
-                        <div class="text-center py-24 flex flex-col items-center animate-pulse">
-                            <div class="w-24 h-24 bg-blue-900 text-white rounded-full flex items-center justify-center mb-8 shadow-2xl">
-                                <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <div class="text-center py-24 animate-pulse">
+                            <div class="w-20 h-20 bg-blue-900 text-white rounded-full flex items-center justify-center mx-auto mb-8">
+                                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-width="3"/></svg>
                             </div>
                             <h2 class="header-font text-4xl font-bold mb-4">Registry Updated</h2>
-                            <p class="font-mono text-blue-900 text-xl mb-6">${docId}</p>
-                            <p class="text-gray-500 text-sm uppercase tracking-widest font-black">Official digital record has been archived and a copy saved locally.</p>
+                            <p class="font-mono text-blue-900 text-xl">${docId}</p>
                         </div>
                     `;
                 } else { throw new Error(); }
             } catch (err) {
-                showNotification("ARCHIVE FAILED", true);
-                btn.disabled = false; btn.innerText = "RETRY ARCHIVE";
+                showNotification("UPLOAD FAILED", true);
+                submitBtn.disabled = false;
+                submitBtn.innerText = "RETRY UPLOAD";
             }
-        });
+        }
     </script>
 </body>
 </html>
